@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Chargement
-df = pd.read_csv("data/5-Camp_Market.csv", sep=';')
+df = pd.read_csv("output/clean_marketing_data.csv", sep=';')
 
 # Inspection initiale
 print("=" * 50)
