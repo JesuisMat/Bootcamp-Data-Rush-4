@@ -60,10 +60,10 @@ print(invalid_marital_rows[['ID', 'Marital_Status', 'Education', 'Income']])
 # Suppression effective
 df = df[~invalid_marital_mask]
 
-invalid_birth_mask = df['Year_Birth'] < 1943
+invalid_birth_mask = df['Year_Birth'] < 1940
 invalid_birth_rows = df[invalid_birth_mask].copy()
 
-print(f"\n⚠️ Suppression de {len(invalid_birth_rows)} lignes avec Year_Birth < 1943 :")
+print(f"\n⚠️ Suppression de {len(invalid_birth_rows)} lignes avec Year_Birth < 1940 :")
 print(invalid_birth_rows[['ID', 'Year_Birth', 'Age', 'Income']])
 
 df = df[~invalid_birth_mask]

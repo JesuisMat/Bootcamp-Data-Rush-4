@@ -95,6 +95,12 @@ print("\n8️⃣ Création de 'Deal_Seeker'")
 df['Deal_Seeker'] = (df['Num_Deals_Purchases'] > df['Num_Deals_Purchases'].median()).astype(int)
 print(f"   ✅ Chasseurs de promos : {df['Deal_Seeker'].mean()*100:.1f}%")
 
+print("\n8️⃣ Création de 'Web_Preference")
+df['Web_Preference'] = df['Num_Web_Purchases'] / (df['Total_Purchases'] + 1)
+print(f"   ✅ Chasseurs de promos : {df['Deal_Seeker'].mean()*100:.1f}%")
+
+
+
 # ============================================
 # 4. SAUVEGARDER
 # ============================================
@@ -115,9 +121,9 @@ print("📊 PHASE 4 : VISUALISATIONS")
 print("="*60)
 
 # Graphique 1 : Distributions
-fig, axes = plt.subplots(2, 3, figsize=(18, 10))
+fig, axes = plt.subplots(3, 3, figsize=(18, 10))
 variables_to_plot = ['Age', 'Income', 'Total_Spend', 'Days_Since_Last_Purchase', 
-                     'Total_Children', 'Days_Since_Join']
+                     'Total_Children', 'Days_Since_Join', 'Web_Preference' ]
 
 for i, var in enumerate(variables_to_plot):
     ax = axes[i // 3, i % 3]
@@ -172,3 +178,4 @@ print(f"📊 Dépenses moyennes : {df['Total_Spend'].mean():.0f}€")
 print(f"📊 Parents : {df['is_parent'].mean()*100:.1f}%")
 print(f"📊 En couple : {df['is_couple'].mean()*100:.1f}%")
 print(f"📊 Taux acceptation campagnes : {df['Accepted_Last_Cmp'].mean()*100:.1f}%")
+print(f"📊 Proportion d'achats en ligne : {df['Accepted_Last_Cmp'].mean()*100:.1f}%")
