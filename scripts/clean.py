@@ -6,6 +6,11 @@ import os
 # --- 1. Charger le dataset ---
 df = pd.read_csv("data/5-Camp_Market.csv", sep=';')
 
+# --- 2. Initialiser un DataFrame pour suivre les suppressions ---
+deletion_log = []  # Liste pour stocker les infos des lignes supprimées
+original_count = len(df)  # Compter le nombre initial de lignes
+
+
 # --- 2. Nettoyage préliminaire ---
 # Supprimer les lignes avec Year_Birth invalide (ex: 1995 avec des enfants)
 # df = df[~((df['Year_Birth'] >= 1990) & (df['Kidhome'] + df['Teenhome'] > 0))]
@@ -14,10 +19,12 @@ df = pd.read_csv("data/5-Camp_Market.csv", sep=';')
 df = df.drop_duplicates(subset=df.columns.difference(['ID']))
 
 # --- 3. Créer les colonnes Age et Ancienneté ---
-current_year = datetime.now().year  # Stocke l'année une fois pour éviter les appels répétés
-df['Age'] = current_year - df['Year_Birth']
+reference_year = 2015
+reference_date = pd.to_datetime('2015-12-31')
+
+df['Age'] = reference_year - df['Year_Birth']
 df['start_membership'] = pd.to_datetime(df['Dt_Customer'], errors='coerce')
-df['Anciennete'] = (datetime.now() - df['start_membership']).dt.days
+df['Anciennete'] = (reference_date - df['start_membership']).dt.days
 
 # --- 4. Gérer les valeurs manquantes dans Income ---
 # Option 1: Remplacer par la médiane groupée par Education (si Age n'est pas encore fiable)
@@ -31,8 +38,36 @@ df['Income'] = df['Income'].fillna(median_income_by_education)
 # Remplacer Income = 666666 par la médiane
 df.loc[df['Income'] == 666666, 'Income'] = df['Income'].median()
 
-# --- 6. Nettoyer Marital_Status ---
-df['Marital_Status'] = df['Marital_Status'].replace(['YOLO', 'Absurd'], 'Other')
+# --- 6. SUPPRIMER (pas remplacer) les statuts maritaux invalides ---
+invalid_marital_mask = df['Marital_Status'].isin(['YOLO', 'Absurd'])
+invalid_marital_rows = df[invalid_marital_mask].copy()  # Sauvegarde pour logging
+
+# Log des lignes supprimées (optionnel mais recommandé)
+print(f"\n⚠️ Suppression de {len(invalid_marital_rows)} lignes avec Marital_Status invalide (YOLO/Absurd) :")
+print(invalid_marital_rows[['ID', 'Marital_Status', 'Education', 'Income']])
+
+# Suppression effective
+df = df[~invalid_marital_mask]
+
+# --- 6. SUPPRIMER (pas remplacer) les statuts maritaux invalides ---
+invalid_marital_mask = df['Marital_Status'].isin(['YOLO', 'Absurd'])
+invalid_marital_rows = df[invalid_marital_mask].copy()  # Sauvegarde pour logging
+
+# Log des lignes supprimées (optionnel mais recommandé)
+print(f"\n⚠️ Suppression de {len(invalid_marital_rows)} lignes avec Marital_Status invalide (YOLO/Absurd) :")
+print(invalid_marital_rows[['ID', 'Marital_Status', 'Education', 'Income']])
+
+# Suppression effective
+df = df[~invalid_marital_mask]
+
+invalid_birth_mask = df['Year_Birth'] < 1943
+invalid_birth_rows = df[invalid_birth_mask].copy()
+
+print(f"\n⚠️ Suppression de {len(invalid_birth_rows)} lignes avec Year_Birth < 1943 :")
+print(invalid_birth_rows[['ID', 'Year_Birth', 'Age', 'Income']])
+
+df = df[~invalid_birth_mask]
+print(f"✅ Lignes restantes : {len(df)}")
 
 # --- 7. Encodage des variables catégorielles ---
 # Education
