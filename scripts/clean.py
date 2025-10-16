@@ -20,7 +20,7 @@ df = df.drop_duplicates(subset=df.columns.difference(['ID']))
 
 # --- 3. Créer les colonnes Age et Ancienneté ---
 reference_year = 2015
-reference_date = pd.to_datetime('2015-12-31')
+reference_date = pd.to_datetime('2015-01-01')
 
 df['Age'] = reference_year - df['Year_Birth']
 df['start_membership'] = pd.to_datetime(df['Dt_Customer'], errors='coerce')
